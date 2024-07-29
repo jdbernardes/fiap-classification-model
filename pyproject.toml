@@ -11,6 +11,7 @@ pre-commit = "^3.7.1"
 ucimlrepo = "^0.0.7"
 seaborn = "^0.13.2"
 scikit-learn = "^1.5.1"
+pandas = "^2.2.2"
 
 
 [tool.poetry.group.dev.dependencies]
