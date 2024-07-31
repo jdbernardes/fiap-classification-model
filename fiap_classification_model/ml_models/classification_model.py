@@ -43,12 +43,12 @@ class ClassificationModel:
     def train_with_cross_validation(
         self, mode: str = "str", model: object = None, k: int = 5
     ):
+        skf = cross_val_k_folders(mode, k)
+        model = model
+        X = normalize_data(self._X)
+        y = encode_labels(self._y)
+        count: int = 1
         if mode.lower() == "str":
-            skf = cross_val_k_folders(mode, k)
-            model = model
-            X = normalize_data(self._X)
-            y = encode_labels(self._y)
-            count: int = 1
             for train_index, val_index in skf.split(X, y):
                 obs: str = f"Cross Validation Stratified Run {count}"
                 x_train, x_test = X[train_index], X[val_index]
@@ -65,7 +65,20 @@ class ClassificationModel:
                 count += 1
             return model
         elif mode.lower() == "full":
-            pass
+            for train_index, val_index in skf.split(X):
+                obs: str = f"Cross Validation Run {count}"
+                x_train, x_test = X[train_index], X[val_index]
+                y_train, y_test = y[train_index], y[val_index]
+                model.fit(x_train, y_train)
+                y_pred = model.predict(x_test)
+                self.calculate_results(
+                    y_pred=y_pred,
+                    y_test=y_test,
+                    model=model,
+                    result_path=self._result_path,
+                    obs=obs,
+                )
+                count += 1
 
     def run_predict(
         self,
